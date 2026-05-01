@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מתמונה בדמיון לתמונה בבינה | Super Lite</title>
+<style>
+:root{
+  --bg:#eef3f8; --panel:#fff; --ink:#1f2937; --muted:#64748b;
+  --blue:#2563eb; --blueDark:#1e3a8a; --line:#cbd5e1; --soft:#f8fafc;
+  --green:#16a34a; --orange:#f59e0b; --red:#dc2626;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,"Noto Sans Hebrew",sans-serif;background:var(--bg);color:var(--ink);line-height:1.55}
+header{background:linear-gradient(135deg,#1e3a8a,#0f172a);color:white;padding:26px 30px;border-bottom:4px solid var(--blue)}
+header .inner{max-width:1100px;margin:auto}
+header h1{margin:0;font-size:28px;line-height:1.25}
+header p{margin:8px 0 0;color:#cbd5e1}
+.identity{background:#dbeafe;border-bottom:1px solid #93c5fd;padding:10px;text-align:center;font-size:13px;color:#1e3a8a;font-weight:bold}
+.layout{max-width:1100px;margin:auto;padding:16px;display:grid;grid-template-columns:260px 1fr;gap:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:0 4px 18px rgba(15,23,42,.08);overflow:hidden}
+.side{padding:14px}.main{padding:18px}.step{display:none}.step.active{display:block}
+h2{color:var(--blueDark);border-right:5px solid var(--blue);padding-right:10px;margin:0 0 14px}
+h3{margin-top:0;color:#334155}
+.stepBtn{width:100%;text-align:right;border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px;margin:6px 0;cursor:pointer}
+.stepBtn.active{background:#dbeafe;border-color:var(--blue);font-weight:bold}
+.stepBtn.done::before{content:"✓ ";color:var(--green);font-weight:bold}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.field{background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px}
+label{font-weight:bold;display:block;margin-bottom:6px}
+select,textarea,input{width:100%;border:1px solid var(--line);border-radius:10px;padding:9px;font-family:inherit;background:#fff}
+textarea{min-height:125px;resize:vertical}
+.help{font-size:13px;color:var(--muted);line-height:1.45;margin-top:5px}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+button{border:0;border-radius:11px;padding:9px 14px;font-weight:bold;cursor:pointer;background:#e2e8f0;color:#111827}
+button.primary{background:linear-gradient(135deg,#2563eb,#1e40af);color:white;box-shadow:0 2px 6px rgba(0,0,0,.15)}
+button.good{background:linear-gradient(135deg,#16a34a,#15803d);color:white}
+button.warn{background:linear-gradient(135deg,#f59e0b,#d97706);color:white}
+button.bad{background:var(--red);color:white}
+.progress{height:13px;background:#e5e7eb;border-radius:999px;overflow:hidden;margin:10px 0}.progress>div{height:100%;width:0;background:linear-gradient(90deg,#22c55e,#2563eb)}
+.notice{border-radius:12px;padding:12px;margin:10px 0;background:#ecfeff;border:1px solid #67e8f9}
+.warning{background:#fff7ed;border-color:#fdba74}
+.promptBox{direction:ltr;text-align:left;min-height:170px}
+.trail{background:#eef6ff;border:1px solid #bfdbfe;border-radius:14px;padding:12px;margin:0 0 14px}
+.trail strong{color:#1e3a8a}.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{background:white;border:1px solid #cbd5e1;border-radius:999px;padding:5px 10px;font-size:12px;color:#334155}.chip.empty{background:#f8fafc;color:#94a3b8;border-style:dashed}
+.imagePreview{height:300px;border:2px dashed #94a3b8;border-radius:16px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#f8fafc;color:#64748b;text-align:center}
+.imagePreview img{width:100%;height:100%;object-fit:contain;background:#fff}
+footer{margin-top:40px;padding:20px;border-top:2px solid #cbd5e1;text-align:center;font-size:13px;color:#475569;line-height:1.7;background:#f8fafc}
+@media(max-width:850px){.layout{grid-template-columns:1fr}.grid{grid-template-columns:1fr}header h1{font-size:24px}}
+</style>
+</head>
+
+<body>
+<header>
+<div class="inner">
+<h1>מתמונה בדמיון לתמונה בבינה | Super Lite</h1>
+<p>מדריך צעדים ראשונים ליצירת תמונה אחת מטקסט</p>
+<p>גרסה פשוטה למורים ולתלמידים בתחילת הדרך</p>
+<p style="font-size:13px;color:#e2e8f0">פותח ע״י: <strong>יקותיאל (קותי) בלוך</strong> | תשפ״ו</p>
+</div>
+</header>
+
+<div class="identity">
+רעיון קצר → נושא → מקום → סגנון → פרומפט → יצירת תמונה → תיקון בסיסי
+</div>
+
+<div class="layout">
+<aside class="card">
+<div class="side">
+<h3>שלבים</h3>
+<div id="nav"></div>
+<div class="progress"><div id="bar"></div></div>
+<div id="progressText" class="help"></div>
+<button onclick="saveLocal()">שמור עבודה</button>
+<button onclick="loadLocal()">טען שמירה</button>
+<button class="bad" onclick="resetAll()">נקה הכל</button>
+</div>
+</aside>
+
+<main class="card">
+<div class="main">
+<div id="trail" class="trail"></div>
+
+<section id="step1" class="step active">
+<h2>שלב 1 — מה רוצים ליצור?</h2>
+<p class="help">בחר סוג תמונה פשוט. אין צורך לנסח פרומפט לבד.</p>
+<div class="grid">
+<div class="field">
+<label>סוג תמונה</label>
+<select id="imageType">
+<option value="">בחר</option>
+<option value="a realistic cinematic image">תמונה ריאליסטית קולנועית</option>
+<option value="a clean educational poster">פוסטר נקי</option>
+<option value="a soft illustration">איור רך</option>
+<option value="a dramatic landscape image">נוף דרמטי</option>
+<option value="a character portrait">דיוקן דמות</option>
+<option value="a simple object-focused image">תמונה ממוקדת אובייקט</option>
+</select>
+</div>
+<div class="field">
+<label>שימוש בתמונה</label>
+<select id="purpose">
+<option value="">בחר</option>
+<option value="for a presentation">למצגת</option>
+<option value="for a classroom activity">לפעילות כיתתית</option>
+<option value="for a poster">לפוסטר</option>
+<option value="as a visual idea for a story">כרעיון חזותי לסיפור</option>
+<option value="as a reference image">כתמונת בסיס להמשך עבודה</option>
+</select>
+</div>
+</div>
+</section>
+
+<section id="step2" class="step">
+<h2>שלב 2 — מי או מה במרכז?</h2>
+<div class="grid">
+<div class="field">
+<label>נושא מרכזי</label>
+<select id="subject">
+<option value="">בחר</option>
+<option value="a curious student">תלמיד/ה סקרן/ית</option>
+<option value="a lone traveler">נוסע/ת בודד/ה</option>
+<option value="a mysterious figure">דמות מסתורית</option>
+<option value="a glowing object">אובייקט זוהר</option>
+<option value="an old book">ספר ישן</option>
+<option value="a small boat">סירה קטנה</option>
+<option value="a futuristic gate">שער עתידני</option>
+<option value="a symbolic tree">עץ סמלי</option>
+</select>
+</div>
+<div class="field">
+<label>מה קורה?</label>
+<select id="action">
+<option value="">בחר</option>
+<option value="standing still and looking ahead">עומד/ת ומביט/ה קדימה</option>
+<option value="discovering something hidden">מגלה משהו נסתר</option>
+<option value="walking toward a distant light">צועד/ת אל אור רחוק</option>
+<option value="holding a glowing object">מחזיק/ה אובייקט זוהר</option>
+<option value="looking at a screen">מתבונן/ת במסך</option>
+<option value="opening an old door">פותח/ת דלת ישנה</option>
+</select>
+</div>
+</div>
+<div class="field">
+<label>תיאור חופשי קצר, אופציונלי</label>
+<textarea id="freeText" placeholder="לדוגמה: תלמידה עומדת מול שער ישן ומחזיקה פנס קטן"></textarea>
+</div>
+</section>
+
+<section id="step3" class="step">
+<h2>שלב 3 — איפה זה קורה?</h2>
+<div class="grid">
+<div class="field">
+<label>סביבה</label>
+<select id="environment">
+<option value="">בחר</option>
+<option value="inside a modern classroom">כיתה מודרנית</option>
+<option value="in a misty forest">יער ערפילי</option>
+<option value="on a desert road">דרך מדברית</option>
+<option value="on a cliff above the sea">צוק מעל הים</option>
+<option value="inside an old library">ספרייה ישנה</option>
+<option value="in a futuristic city">עיר עתידנית</option>
+<option value="in a mountain valley">עמק הררי</option>
+<option value="inside a quiet workshop">סדנה שקטה</option>
+</select>
+</div>
+<div class="field">
+<label>זמן / אווירה בסיסית</label>
+<select id="timeMood">
+<option value="">בחר</option>
+<option value="soft morning light">אור בוקר רך</option>
+<option value="golden hour">שעת זהב</option>
+<option value="twilight atmosphere">דמדומים</option>
+<option value="night with soft moonlight">לילה עם אור ירח</option>
+<option value="stormy sky">שמיים סוערים</option>
+<option value="calm clear atmosphere">אווירה רגועה ובהירה</option>
+</select>
+</div>
+</div>
+</section>
+
+<section id="step4" class="step">
+<h2>שלב 4 — איך התמונה תיראה?</h2>
+<div class="grid">
+<div class="field">
+<label>סגנון</label>
+<select id="style">
+<option value="">בחר</option>
+<option value="realistic cinematic style">ריאליסטי קולנועי</option>
+<option value="soft realistic illustration">איור ריאליסטי רך</option>
+<option value="clean poster design">עיצוב פוסטר נקי</option>
+<option value="documentary realistic style">ריאליזם תיעודי</option>
+<option value="fantasy concept art style">קונספט ארט פנטזיה</option>
+</select>
+</div>
+<div class="field">
+<label>מצלמה</label>
+<select id="camera">
+<option value="">בחר</option>
+<option value="eye level, medium shot">גובה עיניים, צילום בינוני</option>
+<option value="wide shot">צילום רחב</option>
+<option value="close-up">קלוז־אפ</option>
+<option value="low angle cinematic shot">זווית נמוכה קולנועית</option>
+<option value="bird's eye view">מבט מלמעלה</option>
+</select>
+</div>
+</div>
+<div class="field">
+<label>איכות</label>
+<select id="quality">
+<option value="">בחר</option>
+<option value="high quality, clear subject, clean composition, no visual clutter">איכות גבוהה, נושא ברור, קומפוזיציה נקייה, ללא עומס</option>
+<option value="high detail, cinematic lighting, readable composition">פירוט גבוה, תאורה קולנועית, קומפוזיציה קריאה</option>
+<option value="simple, clean, focused visual composition">פשוט, נקי וממוקד</option>
+</select>
+</div>
+</section>
+
+<section id="step5" class="step">
+<h2>שלב 5 — בניית פרומפט</h2>
+<div class="notice">
+כאן המערכת מחברת את הבחירות לפרומפט באנגלית. את הפרומפט מעתיקים לכלי יצירת תמונות כמו Gemini.
+</div>
+<div class="actions">
+<button class="primary" onclick="buildPrompt()">בנה פרומפט</button>
+<button onclick="copyField('prompt')">העתק פרומפט</button>
+<button onclick="downloadPrompt()">הורד TXT</button>
+</div>
+<textarea id="prompt" class="promptBox" placeholder="כאן יופיע הפרומפט באנגלית..."></textarea>
+</section>
+
+<section id="step6" class="step">
+<h2>שלב 6 — יצירה ובדיקה בסיסית</h2>
+<div class="notice warning">
+לאחר יצירת התמונה בכלי הבינה, אפשר להעלות אותה לכאן ולנסח תיקון פשוט.
+</div>
+<div class="field">
+<label>העלה תמונה שנוצרה, אופציונלי</label>
+<div id="imagePreview" class="imagePreview">חלון העלאת תמונה<br>בחר קובץ מתחת</div>
+<input type="file" accept="image/*" onchange="previewImage(event)">
+</div>
+<div class="grid">
+<div class="field">
+<label>מה דורש שיפור?</label>
+<select id="problem">
+<option value="">בחר</option>
+<option value="make the main subject clearer">הנושא לא ברור</option>
+<option value="reduce visual clutter">התמונה עמוסה מדי</option>
+<option value="improve the lighting">התאורה לא מתאימה</option>
+<option value="make the environment clearer">הרקע לא ברור</option>
+<option value="make the image more cinematic">צריך מראה קולנועי יותר</option>
+</select>
+</div>
+<div class="field">
+<label>עוצמת תיקון</label>
+<select id="fixLevel">
+<option value="">בחר</option>
+<option value="slightly improve">תיקון קטן</option>
+<option value="significantly improve">שיפור משמעותי</option>
+<option value="rebuild the prompt more clearly">בנה מחדש בצורה ברורה יותר</option>
+</select>
+</div>
+</div>
+<div class="actions">
+<button class="warn" onclick="buildFixPrompt()">צור פרומפט שיפור</button>
+<button onclick="copyField('fixPrompt')">העתק פרומפט שיפור</button>
+</div>
+<textarea id="fixPrompt" class="promptBox" placeholder="כאן יופיע פרומפט שיפור באנגלית..."></textarea>
+</section>
+
+<section id="step7" class="step">
+<h2>שלב 7 — סיכום קצר</h2>
+<div class="actions">
+<button class="good" onclick="buildSummary()">צור סיכום</button>
+<button onclick="copyField('summary')">העתק סיכום</button>
+</div>
+<textarea id="summary" style="min-height:300px"></textarea>
+<div class="notice">
+סיום גרסת Super Lite: המשתמש עבר רעיון → פרומפט → תמונה → תיקון בסיסי.
+</div>
+</section>
+
+<div class="actions">
+<button onclick="prev()">חזור</button>
+<button class="primary" onclick="next()">הבא</button>
+</div>
+
+</div>
+</main>
+</div>
+
+<footer>
+<strong>מתמונה בדמיון לתמונה בבינה | Super Lite</strong><br>
+מדריך צעדים ראשונים ליצירת תמונה אחת מטקסט<br>
+פותח במיוחד להשתלמות מורים ליישומי גרפיקה במגמת תקשוב — “מרעיון לסרטון”<br>
+© כל הזכויות על פיתוח המודל שמורות<br>
+<strong>יקותיאל (קותי) בלוך | תשפ״ו</strong><br>
+השימוש במערכת מותר למטרות חינוכיות בלבד.
+</footer>
+
+<script>
+let step=1;
+const titles=["רעיון","נושא","מקום","סגנון","פרומפט","בדיקה","סיכום"];
+const required={1:["imageType","purpose"],2:["subject","action"],3:["environment","timeMood"],4:["style","camera","quality"],5:["prompt"],6:["fixPrompt"],7:["summary"]};
+
+function el(id){return document.getElementById(id)}
+function v(id){return el(id)?el(id).value.trim():""}
+function label(id){const e=el(id); return e && e.selectedIndex>=0 ? e.options[e.selectedIndex].text : ""}
+function setv(id,text){el(id).value=text; updateAll()}
+function done(n){return (required[n]||[]).every(id=>v(id))}
+function show(){
+ document.querySelectorAll(".step").forEach(s=>s.classList.remove("active"));
+ el("step"+step).classList.add("active");
+ updateAll();
+}
+function buildNav(){
+ let html="";
+ for(let i=1;i<=7;i++){
+  html+=`<button class="stepBtn ${i===step?'active':''} ${done(i)?'done':''}" onclick="step=${i};show()">${i}. ${titles[i-1]}</button>`;
+ }
+ el("nav").innerHTML=html;
+ let d=0; for(let i=1;i<=7;i++) if(done(i)) d++;
+ el("bar").style.width=(d/7*100)+"%";
+ el("progressText").innerText=`הושלמו ${d} מתוך 7 שלבים`;
+}
+function buildTrail(){
+ const items=[
+  ["סוג",label("imageType")],["שימוש",label("purpose")],["נושא",label("subject")],["פעולה",label("action")],
+  ["סביבה",label("environment")],["אווירה",label("timeMood")],["סגנון",label("style")],["מצלמה",label("camera")]
+ ];
+ el("trail").innerHTML=`<strong>רצף בחירות קצר</strong><div class="help">כך נבנה הפרומפט בהדרגה.</div><div class="chips">${
+  items.map(([k,val])=>`<span class="chip ${val&&val!=="בחר"?'':'empty'}">${k}: ${val&&val!=="בחר"?val:"טרם נבחר"}</span>`).join("")
+ }</div>`;
+}
+function next(){if(step<7){step++;show()}}
+function prev(){if(step>1){step--;show()}}
+
+function buildPrompt(){
+ const subject=v("freeText") || v("subject") || "a clear main subject";
+ const text=`Create one image: ${subject}, ${v("action")}, ${v("environment")}, ${v("timeMood")}. Image type: ${v("imageType")}. Visual style: ${v("style")}. Camera: ${v("camera")}. Quality: ${v("quality")}. Purpose: ${v("purpose")}. Keep the composition clear, coherent, and visually readable. Do not add text unless explicitly requested.`;
+ setv("prompt",text);
+}
+function buildFixPrompt(){
+ if(!v("prompt")){alert("קודם יש לבנות פרומפט.");return;}
+ const text=`Improve this image-generation prompt.
+
+Original prompt:
+${v("prompt")}
+
+Required improvement:
+${v("fixLevel")} and ${v("problem")}.
+
+Return only one improved English prompt for generating a single image. Do not generate an image.`;
+ setv("fixPrompt",text);
+}
+function buildSummary(){
+ const text=`סיכום תהליך — יצירת תמונה מטקסט
+
+1. סוג תמונה: ${label("imageType")}
+2. שימוש: ${label("purpose")}
+3. נושא: ${label("subject")}
+4. פעולה: ${label("action")}
+5. סביבה: ${label("environment")}
+6. אווירה: ${label("timeMood")}
+7. סגנון: ${label("style")}
+8. מצלמה: ${label("camera")}
+
+הפרומפט:
+${v("prompt")}
+
+פרומפט שיפור:
+${v("fixPrompt")}
+
+זכויות:
+כל הזכויות על פיתוח המודל שמורות ליקותיאל (קותי) בלוך | תשפ״ו.`;
+ setv("summary",text);
+}
+function previewImage(ev){
+ const file=ev.target.files[0]; if(!file)return;
+ const reader=new FileReader();
+ reader.onload=e=>{el("imagePreview").innerHTML=`<img src="${e.target.result}" alt="generated image">`};
+ reader.readAsDataURL(file);
+}
+async function copyField(id){
+ const text=v(id); if(!text){alert("אין תוכן להעתקה"); return;}
+ try{await navigator.clipboard.writeText(text); alert("הועתק"); return;}catch(e){}
+ const t=el(id); t.focus(); t.select(); document.execCommand("copy"); alert("הועתק");
+}
+function downloadPrompt(){
+ const text=v("prompt"); if(!text){alert("אין פרומפט להורדה"); return;}
+ const blob=new Blob([text],{type:"text/plain;charset=utf-8"});
+ const a=document.createElement("a");
+ a.href=URL.createObjectURL(blob);
+ a.download="super_lite_image_prompt.txt";
+ document.body.appendChild(a);
+ a.click();
+ document.body.removeChild(a);
+ URL.revokeObjectURL(a.href);
+}
+function saveLocal(){
+ const data={step};
+ document.querySelectorAll("textarea,select").forEach(x=>data[x.id]=x.value);
+ localStorage.setItem("singleImageSuperLite",JSON.stringify(data));
+ alert("נשמר בדפדפן");
+}
+function loadLocal(){
+ const raw=localStorage.getItem("singleImageSuperLite");
+ if(!raw){alert("אין שמירה");return;}
+ const data=JSON.parse(raw);
+ Object.keys(data).forEach(id=>{if(el(id))el(id).value=data[id]});
+ step=data.step||1;
+ show();
+}
+function resetAll(){
+ if(!confirm("למחוק את כל העבודה?"))return;
+ document.querySelectorAll("textarea,select").forEach(x=>x.value="");
+ step=1;show();
+}
+function updateAll(){buildNav(); buildTrail();}
+document.addEventListener("input",updateAll);
+document.addEventListener("change",updateAll);
+show();
+</script>
+</body>
+</html>
